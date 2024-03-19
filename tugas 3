@@ -1,0 +1,49 @@
+#include <LiquidCrystal_I2C.h>  // Mengimpor library LiquidCrystal_I2C
+
+#define pirPin 12  // Mendefinisikan pin sensor PIR sebagai pin 12
+
+int statusPir = LOW;  // Inisialisasi status sensor PIR sebagai LOW
+int m;  // Deklarasi variabel m untuk menyimpan nilai pembacaan sensor PIR
+int count = 0;  // Inisialisasi variabel count untuk menghitung jumlah deteksi gerakan
+
+// Inisialisasi objek LCD dengan alamat 0x27 dan ukuran 20x4
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+
+// Fungsi setup() dieksekusi sekali saat program pertama kali dijalankan
+void setup() {
+  pinMode(pirPin, INPUT);  // Menjadikan pirPin sebagai input
+  lcd.init();  // Menginisialisasi LCD
+  lcd.backlight();  // Menyalakan backlight LCD
+  lcd.setCursor(2, 0);  // Mengatur kursor LCD pada baris kedua, kolom ketiga
+  lcd.print("Tugas PIR dengan LCD");  // Mencetak teks pada LCD
+  lcd.setCursor(4, 1);  // Mengatur kursor LCD pada baris ketiga, kolom kelima
+  lcd.print("Benedict RPG");  // Mencetak teks pada LCD
+  Serial.begin(9600);  // Memulai komunikasi serial dengan baud rate 9600
+  delay(1000);  // Jeda 1 detik
+}
+
+// Fungsi loop() dieksekusi berulang kali
+void loop() {
+  m = digitalRead(pirPin);  // Membaca nilai sensor PIR dan menyimpannya ke dalam variabel m
+  if (m == HIGH) {  // Jika gerakan terdeteksi
+    count++;  // Menambah jumlah deteksi gerakan
+    updateLCD();  // Memperbarui tampilan LCD
+    Serial.print("Motion Detect!");  // Mengirim pesan "Motion Detect!" ke Serial Monitor
+    Serial.println("count = " + String(count));  // Mengirim jumlah deteksi gerakan ke Serial Monitor
+  } else {  // Jika tidak ada gerakan yang terdeteksi
+    Serial.println("No Motion Detected");  // Mengirim pesan "No Motion Detected" ke Serial Monitor
+    lcd.clear();  // Menghapus tampilan LCD
+    lcd.print("count = " + String(count));  // Menampilkan jumlah deteksi gerakan pada LCD
+  }
+  delay(2000);  // Jeda 2 detik
+}
+
+// Fungsi untuk memperbarui tampilan LCD saat gerakan terdeteksi
+void updateLCD() {
+  lcd.clear();  // Membersihkan tampilan LCD
+  lcd.setCursor(2, 0);  // Mengatur kursor pada baris kedua, kolom ketiga
+  lcd.print("Motion Detected!");  // Mencetak teks "Motion Detected!" pada LCD
+  lcd.setCursor(4, 1);  // Mengatur kursor pada baris ketiga, kolom kelima
+  lcd.print("Count = " + String(count));  // Menampilkan jumlah deteksi gerakan pada LCD
+  delay(2000);  // Jeda 2 detik
+}
